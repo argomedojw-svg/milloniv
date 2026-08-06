@@ -1,0 +1,28 @@
+# --- Datos de pacientes: NUNCA deben versionarse ---
+*.json
+!package.json
+!package-lock.json
+!.vscode/*.json
+sesiones/
+protocolos/
+export/
+*.csv
+
+# --- Sistema operativo ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+$RECYCLE.BIN/
+
+# --- Editores ---
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*~
+
+# --- Temporales ---
+*.tmp
+*.log
+node_modules/

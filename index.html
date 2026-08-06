@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCMI-IV · Aplicación y corrección</title>
+<meta name="description" content="Aplicación, corrección e informe interpretativo del Inventario Clínico Multiaxial de Millon-IV. Funciona sin conexión.">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231f4f8f'/><text y='68' x='50' text-anchor='middle' font-size='46' font-family='sans-serif' font-weight='bold' fill='white'>M</text></svg>">
+</head>
+<body>
+
+<header class="topbar no-print">
+  <div class="brand">
+    <div class="brand-mark">IV</div>
+    <div>MCMI-IV <small>Inventario Clínico Multiaxial de Millon-IV</small></div>
+  </div>
+  <div class="topbar-spacer"></div>
+  <span id="integrityBadge" class="badge">…</span>
+  <button id="btnTheme" class="btn btn-ghost btn-sm" title="Cambiar tema">◐ Tema</button>
+</header>
+
+<main class="wrap">
+
+<!-- ================= INICIO ================= -->
+<section id="view-home" class="view active">
+  <div class="card hero">
+    <h1>Aplicación y corrección del MCMI-IV</h1>
+    <p>Administra los 195 ítems, calcula puntuaciones directas, tasas base ajustadas y percentiles
+       con los baremos españoles, y genera un informe interpretativo siguiendo el procedimiento
+       de tres fases del manual. Todo se ejecuta en este dispositivo, sin conexión y sin enviar datos.</p>
+    <div class="btn-row">
+      <button id="btnNew" class="btn btn-lg">Nueva aplicación</button>
+      <button id="btnResume" class="btn btn-ghost btn-lg">Continuar sesión guardada</button>
+      <button id="btnImport" class="btn btn-ghost btn-lg"
+              title="Carga un archivo .json exportado previamente y restaura ese protocolo completo">Importar archivo</button>
+      <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    </div>
+    <div id="resumeInfo"></div>
+
+    <details class="help-panel">
+      <summary>¿Qué hace cada botón?</summary>
+      <dl class="help-list">
+        <dt>Nueva aplicación</dt>
+        <dd>Vacía cualquier protocolo en curso y empieza de cero: primero los datos del sujeto y
+            después los 195 ítems.</dd>
+
+        <dt>Continuar sesión guardada</dt>
+        <dd>Retoma el protocolo que quedó a medias en este navegador. La aplicación autoguarda cada
+            respuesta en el almacenamiento local del dispositivo, así que puedes cerrar la pestaña o
+            apagar el equipo y seguir después por el primer ítem sin responder. Solo se conserva una
+            sesión en curso: al pulsar «Nueva aplicación» o «Importar archivo» se sustituye.</dd>
+
+        <dt>Importar archivo</dt>
+        <dd>Carga un archivo <code>.json</code> generado antes con «Exportar sesión» y restaura ese
+            protocolo: los datos del sujeto, las 195 respuestas Verdadero/Falso una a una y el estado
+            del interruptor de ajustes. Si el protocolo está completo va directamente al informe; si
+            quedan ítems sin responder abre el inventario donde se dejó. Es la vía para recuperar una
+            aplicación archivada, abrirla en otro ordenador o volver a corregir un protocolo antiguo.
+            <strong>Reemplaza la sesión que haya en curso</strong>, así que conviene exportar antes lo
+            que estés haciendo.</dd>
+
+        <dt>Diagnóstico e historial</dt>
+        <dd>Muestra la autocomprobación que contrasta la codificación interna con las cifras
+            publicadas en los anexos del manual, y la lista de aplicaciones ya finalizadas en este
+            dispositivo, que puedes reabrir con un clic.</dd>
+      </dl>
+    </details>
+  </div>
+
+  <div class="card">
+    <div class="feature-grid">
+      <div class="feature"><h3>Corrección con el algoritmo del manual</h3>
+        <p>Ponderación prototípica (2 pts) y no prototípica (1 pt), tablas de conversión de los
+           anexos D.1 a D.4 transcritas íntegramente y reglas de puntuabilidad del capítulo 2.</p></div>
+      <div class="feature"><h3>45 facetas de Grossman</h3>
+        <p>Puntuación y perfil de las facetas de las tres escalas de personalidad más elevadas,
+           más la tabla completa de las 45 facetas.</p></div>
+      <div class="feature"><h3>Índices de validez completos</h3>
+        <p>V, W, X, Y y Z con sus puntos de corte, ajuste por Sinceridad y por Ansiedad/Depresión
+           mayor, y lectura configural del estilo de respuesta.</p></div>
+      <div class="feature"><h3>Informe en tres fases</h3>
+        <p>Validez y respuestas significativas, análisis configural de las elevaciones con
+           polaridades y dominios, y síntesis clínica integrada.</p></div>
+      <div class="feature"><h3>Sin conexión y sin servidor</h3>
+        <p>Guardado automático en el navegador, exportación a JSON y CSV, e impresión o PDF
+           con formato de informe clínico.</p></div>
+      <div class="feature"><h3>Datos verificables</h3>
+        <p>Una autocomprobación contrasta la codificación interna con las cifras publicadas
+           en los anexos del manual. Consultable en «Diagnóstico».</p></div>
+    </div>
+    <div class="btn-row" style="margin-top:20px">
+      <button id="btnDiag" class="btn btn-ghost btn-sm">Diagnóstico e historial</button>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Uso profesional.</strong> El MCMI-IV requiere nivel de cualificación C: titulación superior
+    en psicología o psiquiatría y experiencia profesional en diagnóstico clínico. Está baremado para
+    adultos a partir de 18 años que buscan o reciben atención psicológica; no es un instrumento de
+    evaluación de la personalidad general para población no clínica ni resulta apropiado para adolescentes.
+    Esta herramienta reproduce el procedimiento de corrección descrito en el manual con fines de apoyo
+    clínico personal; no está afiliada a Pearson ni a DICANDRIEN, Inc., y no sustituye a la plataforma
+    oficial de corrección. MCMI y Millon son marcas registradas por DICANDRIEN, Inc.
+  </div>
+</section>
+
+<!-- ================= DATOS ================= -->
+<section id="view-datos" class="view">
+  <div class="card">
+    <h1>Datos de la aplicación</h1>
+    <p class="lead">Todos los campos son opcionales salvo los que el manual exige para que el inventario
+       sea puntuable: fecha de nacimiento o edad, sexo, código identificativo y fecha de aplicación.</p>
+
+    <fieldset>
+      <legend>Datos del sujeto</legend>
+      <div class="form-grid">
+        <div class="field"><label for="f-name">Nombre (opcional)</label><input id="f-name" type="text" autocomplete="off"></div>
+        <div class="field"><label for="f-birth">Fecha de nacimiento</label><input id="f-birth" type="date"></div>
+        <div class="field"><label for="f-age">Edad</label><input id="f-age" type="number" min="0" max="120"></div>
+        <div class="field"><label for="f-sex">Sexo</label>
+          <select id="f-sex"><option value="">—</option><option>Varón</option><option>Mujer</option></select></div>
+        <div class="field"><label for="f-education">Nivel educativo</label>
+          <select id="f-education">
+            <option value="">—</option>
+            <option>Sin estudios</option>
+            <option>Educación primaria</option>
+            <option>Educación secundaria</option>
+            <option>Bachillerato superior o formación profesional</option>
+            <option>Diplomatura, licenciatura o titulaciones superiores</option>
+          </select></div>
+        <div class="field"><label for="f-civil">Estado civil</label>
+          <select id="f-civil">
+            <option value="">—</option>
+            <option>Soltero</option><option>Casado</option><option>Casado más de una vez</option>
+            <option>Separado</option><option>Divorciado</option><option>Viudo</option>
+            <option>Viviendo en pareja (sin estar casado)</option><option>Otros</option>
+          </select></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Los dos problemas que más le preocupan (máximo 2)</legend>
+      <div id="f-problems" class="chk-grid"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Datos de la aplicación</legend>
+      <div class="form-grid">
+        <div class="field"><label for="f-examiner">Examinador</label><input id="f-examiner" type="text" autocomplete="off"></div>
+        <div class="field"><label for="f-date">Fecha de aplicación</label><input id="f-date" type="date"></div>
+        <div class="field"><label for="f-code">Código identificativo del sujeto</label><input id="f-code" type="text" autocomplete="off"></div>
+        <div class="field field-wide"><label for="f-setting">Situación actual</label>
+          <select id="f-setting">
+            <option value="">—</option>
+            <option>Paciente ambulatorio sin hospitalización previa</option>
+            <option>Paciente ambulatorio con hospitalización previa</option>
+            <option>Paciente ingresado en hospital psiquiátrico</option>
+            <option>Paciente ingresado en hospital general</option>
+            <option>Paciente en centro penitenciario</option>
+            <option>Paciente en clínica universitaria</option>
+            <option>Otra</option>
+          </select></div>
+        <div class="field field-wide"><label for="f-episode">Duración del episodio más reciente</label>
+          <select id="f-episode">
+            <option value="">—</option>
+            <option>Menos de 1 semana</option><option>1-4 semanas</option><option>1-3 meses</option>
+            <option>3 meses-1 año</option><option>1-3 años (cíclico)</option><option>1-3 años (continuo)</option>
+            <option>3-7 años (cíclico)</option><option>3-7 años (continuo)</option>
+            <option>Más de 7 años</option><option>No aplicable</option>
+          </select></div>
+      </div>
+    </fieldset>
+
+    <div class="btn-row">
+      <button id="btnStartTest" class="btn btn-lg">Comenzar el inventario</button>
+      <button id="btnSkipData" class="btn btn-ghost">Omitir y comenzar</button>
+      <button class="btn btn-ghost" data-goto="home">Volver</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TEST ================= -->
+<section id="view-test" class="view">
+  <div class="test-head no-print">
+    <div class="test-head-row">
+      <div class="progress"><span id="progressBar" style="width:0%"></span></div>
+      <span id="progressText">0 de 195</span>
+      <span id="saveFlag" class="save-flag">Guardado ✓</span>
+      <select id="selPageSize" class="btn btn-ghost btn-sm" title="Ítems por pantalla">
+        <option value="1">1 ítem por pantalla</option>
+        <option value="5">5 ítems</option>
+        <option value="10">10 ítems</option>
+        <option value="20">20 ítems</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="instructions no-print">
+    <p style="margin:0"><strong>Instrucciones.</strong> A continuación figuran frases que pueden describir
+    sus sentimientos y actitudes. Lea cuidadosamente cada frase y responda con la mayor sinceridad posible.
+    No se preocupe si algunas frases le parecen poco frecuentes. Si está de acuerdo con una frase o cree
+    que le describe, marque <strong>Verdadero</strong>; si no, marque <strong>Falso</strong>. Intente
+    responder a todas las frases aunque no esté seguro; si después de intentarlo no es capaz de decidirse,
+    marque <strong>Falso</strong>. No hay límite de tiempo.
+    <span class="small muted">En modo de un ítem por pantalla puede usar las teclas V y F, y las flechas ← → para navegar.</span></p>
+  </div>
+
+  <div id="itemList"></div>
+
+  <div class="test-foot no-print">
+    <button id="btnPrev" class="btn btn-ghost">← Anterior</button>
+    <button id="btnNext" class="btn btn-ghost">Siguiente →</button>
+    <span id="pageInfo"></span>
+    <span class="spacer"></span>
+    <button id="btnGotoPending" class="btn btn-ghost btn-sm">Ir al primer ítem sin responder</button>
+    <button id="btnFinish" class="btn">Finalizar y corregir</button>
+  </div>
+</section>
+
+<!-- ================= RESULTADOS ================= -->
+<section id="view-results" class="view">
+  <div class="toolbar no-print">
+    <button id="btnPrint" class="btn"
+            title="Abre el diálogo de impresión con el informe maquetado; elige «Guardar como PDF» para archivarlo">Imprimir / Guardar en PDF</button>
+    <button id="btnExportJSON" class="btn btn-ghost"
+            title="Guarda el protocolo completo (datos y 195 respuestas) en un archivo reimportable">Exportar sesión (JSON)</button>
+    <button id="btnExportCSV" class="btn btn-ghost"
+            title="Guarda la tabla de puntuaciones ya calculadas para abrirla en Excel">Exportar puntuaciones (CSV)</button>
+    <button id="btnBackTest" class="btn btn-ghost">Volver al inventario</button>
+    <button class="btn btn-ghost" data-goto="home">Inicio</button>
+    <span class="spacer"></span>
+    <label class="switch" title="Activa o desactiva el ajuste por la escala X y por las escalas A/CC">
+      <input type="checkbox" id="chkAdjust" checked> Aplicar ajustes de tasa base
+    </label>
+  </div>
+
+  <details class="help-panel no-print">
+    <summary>¿Qué hace cada acción de esta barra?</summary>
+    <dl class="help-list">
+      <dt>Aplicar ajustes de tasa base</dt>
+      <dd>Activa o desactiva las dos correcciones que el manual aplica automáticamente <em>antes</em>
+          de interpretar el perfil, y recalcula el informe entero al instante.
+        <ul>
+          <li><strong>Ajuste por la escala X (Sinceridad).</strong> Compensa lo abierto o reservado
+              que ha sido el sujeto al responder. Si ha minimizado sus síntomas (PD&nbsp;&lt;&nbsp;21)
+              <em>sube</em> las tasas base de las escalas 1–P y A–PP; si los ha exagerado
+              (PD&nbsp;&gt;&nbsp;60) las <em>baja</em>.</li>
+          <li><strong>Ajuste por las escalas A (Ansiedad) y CC (Depresión mayor).</strong> Parte del
+              principio de que un estado de ansiedad o depresión profunda en el momento de responder
+              distorsiona al alza las escalas de personalidad más sensibles. Resta puntos a
+              2B, 8B, C, 2A y S en proporción a lo que A y CC exceden de TB&nbsp;75.</li>
+        </ul>
+        Con la casilla marcada, la columna <strong>TB ajustada</strong> es la que debe interpretarse
+        clínicamente. Al desmarcarla el informe se reconstruye usando solo las tasas base directas.
+        Las tablas muestran siempre ambas columnas, de modo que puedes comparar el efecto del ajuste
+        escala por escala.
+        <p class="small muted" style="margin:.5em 0 0">El manual publica la <em>dirección</em> de
+          ambos ajustes pero no sus tablas numéricas, que pertenecen al corrector online de Pearson.
+          Aquí se aplica un modelo lineal explícito, detallado en la sección «Nota metodológica» del
+          informe. Por eso la opción es desactivable: cualquier conclusión puede reconstruirse sin
+          los ajustes.</p>
+      </dd>
+
+      <dt>Exportar sesión (JSON)</dt>
+      <dd>Descarga un archivo con todo lo necesario para reconstruir la aplicación: los datos del
+          sujeto, las 195 respuestas Verdadero/Falso una a una y el estado del interruptor de ajustes.
+          Es el formato de <strong>archivo y copia de seguridad</strong>: al reimportarlo se recupera
+          exactamente el mismo protocolo y se puede volver a corregir o seguir respondiendo. No
+          guarda puntuaciones, porque se recalculan al abrirlo; eso significa que un archivo antiguo
+          se corrige siempre con la versión actual de la aplicación. El archivo se llama
+          <code>MCMI-IV_&lt;código o nombre&gt;_&lt;fecha&gt;.json</code> y contiene datos clínicos:
+          guárdalo donde corresponda.</dd>
+
+      <dt>Exportar puntuaciones (CSV)</dt>
+      <dd>Descarga la tabla de resultados <strong>ya calculados</strong>, separada por punto y coma y
+          codificada en UTF-8 con BOM para que Excel respete los acentos. Incluye tres bloques: las
+          25 escalas (PD, PD máxima, TB sin ajustar, TB ajustada y percentil), las 45 facetas de
+          Grossman y los 5 índices de validez. Sirve para volcar los resultados a una hoja de cálculo,
+          comparar aplicaciones sucesivas del mismo paciente o hacer análisis agregados. No permite
+          reconstruir el protocolo —no contiene las respuestas—; para eso está el JSON.</dd>
+
+      <dt>Imprimir / Guardar en PDF</dt>
+      <dd>Abre el diálogo de impresión con el informe maquetado a página: despliega automáticamente
+          las secciones plegadas, oculta los botones y evita que las tablas y fichas se partan entre
+          páginas. Eligiendo «Guardar como PDF» como destino se obtiene el informe archivable.</dd>
+
+      <dt>Volver al inventario</dt>
+      <dd>Regresa a la administración de ítems conservando las respuestas, por si hay que corregir
+          alguna o completar los que quedaron sin responder. Al finalizar de nuevo se recalcula todo.</dd>
+    </dl>
+  </details>
+
+  <div id="reportHost"></div>
+</section>
+
+<!-- ================= DIAGNÓSTICO ================= -->
+<section id="view-diag" class="view">
+  <div class="card">
+    <h1>Autocomprobación de integridad</h1>
+    <p class="lead">Contrasta la codificación interna de ítems, escalas, facetas y baremos con las
+       cifras publicadas en los anexos A, B, C y D del manual, y ejecuta pruebas funcionales del
+       motor de corrección.</p>
+    <div id="selftestHost"></div>
+  </div>
+  <div class="card">
+    <h2>Aplicaciones guardadas en este dispositivo</h2>
+    <div id="archiveHost"></div>
+  </div>
+  <div class="btn-row"><button class="btn btn-ghost" data-goto="home">Volver al inicio</button></div>
+</section>
+
+</main>
+
+<script src="js/items.js"></script>
+<script src="js/scales.js"></script>
+<script src="js/norms.js"></script>
+<script src="js/interpret.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/selftest.js"></script>
+<script src="js/report.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
